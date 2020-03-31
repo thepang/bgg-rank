@@ -16,4 +16,4 @@ scikit-learn
 pandas
 
 # Other
-jupyter notebook
+jupyter

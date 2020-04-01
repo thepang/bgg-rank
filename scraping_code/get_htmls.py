@@ -1,6 +1,7 @@
-import nucleus as n
 import requests
 from bs4 import BeautifulSoup
+
+from scraping_code import nucleus as n
 
 
 def get_html(url, save_location, return_html=False):
@@ -26,6 +27,7 @@ def get_html(url, save_location, return_html=False):
 
     soup = BeautifulSoup(r.text, "lxml")
 
+    print(f"Saving to {save_location}")
     with open(save_location, "w") as file:
         file.write(soup.prettify())
 

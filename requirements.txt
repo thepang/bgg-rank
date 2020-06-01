@@ -3,6 +3,7 @@ pre-commit
 black
 flake8
 regex
+boto3
 
 # Web scraping
 requests
@@ -17,3 +18,4 @@ pandas
 
 # Other
 jupyter
+python-dotenv

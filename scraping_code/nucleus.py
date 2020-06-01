@@ -1,4 +1,9 @@
+import glob
 import os
+
+
+def chunker(seq, size):
+    return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
 def check_file(file, log=False):
@@ -14,3 +19,31 @@ def check_file(file, log=False):
         return True
     else:
         return False
+
+
+def get_file_names(path):
+    """
+     Goes to location and finds all files in the folder
+     :param path: Path to check for file
+     :return: list of files
+     """
+
+    files_to_parse = list()
+    for text_path in glob.glob(f"{path}/*"):
+        files_to_parse.append(text_path)
+
+    return files_to_parse
+
+
+def save(path):
+    """
+     Goes to location and finds all files in the folder
+     :param path: Path to check for file
+     :return: list of files
+     """
+
+    files_to_parse = list()
+    for text_path in glob.glob(f"{path}/*"):
+        files_to_parse.append(text_path)
+
+    return files_to_parse

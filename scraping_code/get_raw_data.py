@@ -1,3 +1,4 @@
+import math
 import time
 
 import requests
@@ -17,7 +18,7 @@ def get_html(url, save_location, return_html=False):
     :raises Exception: Page was not accessible
     """
 
-    if n.check_file(save_location):
+    if n.file_exists(save_location):
         return save_location
 
     r = requests.get(url)
@@ -48,16 +49,24 @@ def get_xml(game_ids, save_location):
     :raises Exception: Error from API
     """
 
-    # Remove ids from list if their corresponding XML file exists.
-    skip_count = 0
+    print(f"Found {len(game_ids)} ids to check...")
+
+    games_to_check = list()
 
     for i in game_ids:
-        if n.check_file(f"{save_location}/xml_{i}"):
-            game_ids.remove(i)
-            skip_count += 1
-    print(f"Skipping {skip_count} files because they were already found")
+        i = str(i)
+        if not n.file_exists(f"{save_location}/xml_{i.zfill(7)}"):
+            games_to_check.append(i)
+    print(
+        f"Skipping {len(game_ids)-len(games_to_check)} files because they were already found"
+    )
 
-    for chunk in n.chunker(game_ids, 200):
+    batches = 200
+    batch_no = math.ceil(len(game_ids) / batches)
+    i = 1
+
+    for chunk in n.chunker(games_to_check, batches):
+        print(f"Processing {i}/{batch_no} of batches")
         s = [str(game_id) for game_id in chunk]
         chunk_ids = ",".join(s)
 
@@ -65,11 +74,9 @@ def get_xml(game_ids, save_location):
         r = requests.get(url)
         soup = BeautifulSoup(r.text, "lxml")
 
-        game_xmls = soup.find_all("boardgame")
+        with open(f"{save_location}/xml_batch_{i:04}.xml", "w") as file:
+            file.write(soup.prettify())
 
-        for game in game_xmls:
-            i = game["objectid"]
-            print(f"Saving to {save_location}/xml_{i.zfill(7)}")
-            with open(f"{save_location}/xml_{i.zfill(7)}", "w") as file:
-                file.write(game.prettify())
         time.sleep(5)
+
+    print("Complete!")

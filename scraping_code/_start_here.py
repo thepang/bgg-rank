@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from scraping_code import aws as aws
 from scraping_code import get_raw_data as grd
 from scraping_code import nucleus as n
-from scraping_code import refine_data as ph
+from scraping_code import refine_data as rd
 
 # Local directory info
 ROOT = "/Users/pang/repos/bgg-rank"
@@ -15,6 +15,7 @@ RAW_HTML = "data/01_raw_htmls"
 RAW_XML = "data/02_raw_xmls"
 PARSED = "data/03_parsed"
 GAME_IDS = "game_id_name_rating.csv"
+XML_DATA = "xml_data.csv"
 
 # AWS info
 PREFIX = "data"
@@ -39,13 +40,15 @@ for page_no in range(1, 256):
         time.sleep(5)
 
 # Parse html from board game rank list to CSV if CSV doesn't exist.
-if not n.check_file(f"{ROOT}/{PARSED}/{GAME_IDS}"):
-    data_to_save = ph.parse_bgg_list_page(f"{ROOT}/{RAW_HTML}")
+if not n.file_exists(f"{ROOT}/{PARSED}/{GAME_IDS}"):
+    data_to_save = rd.parse_bgg_list_page(f"{ROOT}/{RAW_HTML}")
     data = pd.DataFrame(data_to_save).T
     data.to_csv(f"{ROOT}/{PARSED}/{GAME_IDS}", index_label="game_id")
 
-data = pd.read_csv(f"{ROOT}/{PARSED}/{GAME_IDS}", index_col="game_id")
-grd.get_xml(list(data.index.values), f"{ROOT}/{RAW_XML}")
+# Get data from game ID CSV and get XML data if XML CSV doesn't exist.
+if not n.file_exists(f"{ROOT}/{PARSED}/{XML_DATA}"):
+    data = pd.read_csv(f"{ROOT}/{PARSED}/{GAME_IDS}", index_col="game_id")
+    grd.get_xml(list(data.index.values), f"{ROOT}/{RAW_XML}")
 
 # Store CSV in S3
 load_dotenv()

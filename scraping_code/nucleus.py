@@ -6,7 +6,7 @@ def chunker(seq, size):
     return (seq[pos : pos + size] for pos in range(0, len(seq), size))
 
 
-def check_file(file, log=False):
+def file_exists(file, log=False):
     """
     Checks if given file exists.
     :param file: File to check for existence.
